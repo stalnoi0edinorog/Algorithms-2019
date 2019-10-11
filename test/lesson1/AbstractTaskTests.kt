@@ -1,6 +1,7 @@
 package lesson1
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import util.PerfResult
 import util.estimate
 import java.io.BufferedWriter
@@ -45,6 +46,27 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        try {
+            sortTimes("input/empty.txt", "temp.txt")
+            assertFileContent("temp.txt", "")
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortTimes("input/time_in5.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortTimes("input/time_in6.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortTimes("input/time_in7.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
@@ -70,6 +92,11 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         try {
             sortAddresses("input/addr_in3.txt", "temp.txt")
             assertFileContent("temp.txt", File("input/addr_out3.txt").readLines())
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortAddresses("input/addr_in4.txt", "temp.txt") }
         } finally {
             File("temp.txt").delete()
         }
@@ -118,7 +145,28 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
-
+        try {
+            sortTemperatures("input/temp_in2.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/temp_out2.txt").readLines())
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            sortTemperatures("input/empty.txt", "temp.txt")
+            assertFileContent("temp.txt", "")
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortTemperatures("input/temp_in3.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortTemperatures("input/temp_in4.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
         fun testGeneratedTemperatures(size: Int): PerfResult<Unit> {
             try {
                 val res = generateTemperatures(size)

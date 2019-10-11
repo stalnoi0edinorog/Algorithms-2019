@@ -74,9 +74,48 @@ abstract class AbstractAlgorithmsTests {
     }
 
     fun longestCommonSubstring(longestCommonSubstring: (String, String) -> String) {
-        assertEquals("", longestCommonSubstring("мой мир", "я"))
-        assertEquals("зд", longestCommonSubstring("здравствуй мир", "мы здесь"))
         assertEquals("СЕРВАТОР", longestCommonSubstring("ОБСЕРВАТОРИЯ", "КОНСЕРВАТОРЫ"))
+        assertEquals("ОБСЕРВАТОРИЯ", longestCommonSubstring("ОБСЕРВАТОРИЯ", "ОБСЕРВАТОРИЯ"))
+        assertEquals(
+            "Я трачу, что осталось в русской речи\nна Ваш анфас и матовые плечи",
+            longestCommonSubstring(
+                "Я трачу, что осталось в русской речи\nна Ваш анфас и матовые плечи",
+                "Я трачу, что осталось в русской речи\nна Ваш анфас и матовые плечи"
+            )
+        )
+        assertEquals(
+            "\nЯ вас любил так ", longestCommonSubstring(
+                """
+Я вас любил: любовь еще, быть может,
+В душе моей угасла не совсем;
+Но пусть она вас больше не тревожит;
+Я не хочу печалить вас ничем.
+Я вас любил безмолвно, безнадежно,
+То робостью, то ревностью томим;
+Я вас любил так искренно, так нежно
+Как дай вам Бог любимой быть другим.
+            """.trimIndent(),
+                """
+Я вас любил. Любовь еще (возможно,
+что просто боль) сверлит мои мозги.
+Все разлетелось к черту на куски.
+Я застрелиться пробовал, но сложно
+с оружием. И далее: виски:
+в который вдарить? Портила не дрожь, но
+задумчивость. Черт! Все не по-людски!
+Я вас любил так сильно, безнадежно,
+Как дай вам Бог другими — но не даст!
+Он, будучи на многое горазд,
+не сотворит — по Пармениду — дважды
+сей жар в крови, ширококостный хруст,
+чтоб пломбы в пасти плавились от жажды
+коснуться — «бюст» зачеркиваю — уст!
+                """.trimIndent()
+            )
+        )
+        assertEquals("", longestCommonSubstring("мой мир", "я"))
+        assertEquals("\n", longestCommonSubstring("Циклоп\nГидра", "Cyclops\nHydra"))
+        assertEquals("зд", longestCommonSubstring("здравствуй мир", "мы здесь"))
         assertEquals(
             "огда ", longestCommonSubstring(
                 """
@@ -124,6 +163,7 @@ abstract class AbstractAlgorithmsTests {
 
     fun calcPrimesNumber(calcPrimesNumber: (Int) -> Int) {
         assertEquals(0, calcPrimesNumber(-1))
+        assertEquals(0, calcPrimesNumber(-16))
         assertEquals(0, calcPrimesNumber(1))
         assertEquals(1, calcPrimesNumber(2))
         assertEquals(2, calcPrimesNumber(4))

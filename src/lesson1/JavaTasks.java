@@ -2,6 +2,11 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -34,9 +39,47 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
+    // трудоёмкость O(n^2)
     static public void sortTimes(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(inputName));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputName));
+            DateTimeFormatter formatter =  DateTimeFormatter.ofPattern("hh:mm:ss a");
+            List<LocalTime> dateList = new ArrayList<>();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.matches("([1][0-2]|0[0-9]):[0-5][0-9]:[0-5][0-9]\\s(AM|PM)"))
+                    throw new IllegalArgumentException();
+                LocalTime date = LocalTime.parse(line, formatter);
+                dateList.add(date);
+            }
+
+            boolean sorted = false;
+            while (!sorted) {
+            sorted = true;
+            for (int i = 0; i < dateList.size() - 1; i++) {
+                if (dateList.get(i).compareTo(dateList.get(i + 1)) > 0) {
+                    LocalTime date = dateList.get(i);
+                    dateList.set(i, dateList.get(i + 1));
+                    dateList.set(i + 1, date);
+                    sorted = false;
+                }
+            }
+        }
+
+            for (LocalTime el: dateList) {
+                writer.write(el.format(formatter));
+                writer.write("\n");
+        }
+            reader.close();
+            writer.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
+
 
     /**
      * Сортировка адресов
@@ -64,8 +107,72 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
+    //Трудоёмкссть O(n^2)
     static public void sortAddresses(String inputName, String outputName) {
-        throw new NotImplementedError();
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(inputName));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputName));
+            Map<String, ArrayList<Integer>> streetsAndHouses = new HashMap<>();
+            Map<String, ArrayList<String>> streetsAndPersons = new HashMap<>();
+            List<String> housesSorted = new ArrayList<>();
+            List<String> addressSorted = new ArrayList<>();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.matches("(\\D+\\s?)+-\\s(\\D+\\s?)\\s\\d+"))
+                    throw new IllegalArgumentException();
+
+                String address = line.split("\\s-\\s")[1];
+                String street = address.split("\\s")[0];
+                Integer houseNumber = Integer.valueOf(address.split("\\s")[1]);
+                String person = line.split("\\s-\\s")[0];
+
+                if (!streetsAndHouses.containsKey(street))
+                    streetsAndHouses.put(street, new ArrayList<>());
+                if (!streetsAndHouses.get(street).contains(houseNumber))
+                    streetsAndHouses.get(street).add(houseNumber);
+                if (!streetsAndPersons.containsKey(address))
+                    streetsAndPersons.put(address, new ArrayList<>());
+
+                streetsAndPersons.get(address).add(person);
+
+                if (!housesSorted.contains(street))
+                    housesSorted.add(street);
+            }
+
+
+            for (Map.Entry<String, ArrayList<String>> pair: streetsAndPersons.entrySet()){
+                Collections.sort(pair.getValue());
+            }
+
+            Collections.sort(housesSorted);
+
+            for (Map.Entry<String, ArrayList<Integer>> pair: streetsAndHouses.entrySet())
+                Collections.sort(pair.getValue());
+
+            for (String street: housesSorted) {
+                for (Integer i: streetsAndHouses.get(street)) {
+                    addressSorted.add(street + " " + i);
+                }
+            }
+
+            for (String address: addressSorted) {
+                writer.write(address + " - ");
+                for (String name : streetsAndPersons.get(address)) {
+                    writer.write(name);
+                    if (!name.equals(streetsAndPersons.get(address).get(streetsAndPersons.get(address).size() - 1)))
+                        writer.write(", ");
+                }
+                writer.write("\n");
+            }
+
+            writer.close();
+            reader.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -98,8 +205,60 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
+    //Трудоёмкость O(n^2)
     static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(inputName));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputName));
+            List<Double> listOfNumbers = new ArrayList<>();
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.matches("-?\\d+\\.\\d+"))
+                    throw new IllegalArgumentException();
+                double number = Double.valueOf(line);
+
+                if (listOfNumbers.isEmpty()) {
+                    listOfNumbers.add(number);
+                    continue;
+                }
+                if (listOfNumbers.size() == 1) {
+                    if (listOfNumbers.get(0) <= number)
+                        listOfNumbers.add(number);
+                    else
+                        listOfNumbers.add(0, number);
+                    continue;
+                }
+                if (number > listOfNumbers.get(listOfNumbers.size() - 1)) {
+                    listOfNumbers.add(number);
+                    continue;
+                }
+                if (number < listOfNumbers.get(0)) {
+                    listOfNumbers.add(0, number);
+                    continue;
+                }
+                if (listOfNumbers.contains(number)) {
+                    listOfNumbers.add(listOfNumbers.indexOf(number) + 1, number);
+                    continue;
+                }
+                for (int i = 0; i < listOfNumbers.size() - 1; i++) {
+                    if (number < listOfNumbers.get(i + 1) && number > listOfNumbers.get(i)) {
+                        listOfNumbers.add(i + 1, Double.valueOf(line));
+                        break;
+                    }
+                }
+            }
+
+            for (Double number: listOfNumbers) {
+                writer.write(String.valueOf(number));
+                writer.write("\n");
+            }
+
+            writer.close();
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
