@@ -6,6 +6,8 @@ import kotlin.Pair;
 import java.io.*;
 import java.util.*;
 
+import static java.lang.Math.abs;
+
 @SuppressWarnings("unused")
 public class JavaAlgorithms {
     /**
@@ -32,36 +34,38 @@ public class JavaAlgorithms {
      * <p>
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    //Трудоёмкость O(n^2)
+    // Трудоёмкость O(n)
+    // Ресурсоёмкость O(n)
     static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {
+        List<Integer> prices = new ArrayList<>();
+        int minIndex = 0;
         int buy = 0;
-        int sale = 0;
-        int maxProfit = 0;
-        ArrayList<Integer> list = new ArrayList<>();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(inputName));
+        int sell = 0;
+        int maxProfit = Integer.MIN_VALUE;
 
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputName))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (!line.matches("\\d+"))
                     throw new IllegalArgumentException();
-                list.add(Integer.valueOf(line));
+                prices.add(Integer.valueOf(line));
             }
 
-            for (int i = 0; i < list.size() - 1; i++)
-                for (int j = i + 1; j < list.size(); j++) {
-                    int profit = list.get(j) - list.get(i);
-                    if (profit > maxProfit) {
-                        maxProfit = profit;
-                        buy = i;
-                        sale = j;
-                    }
+            for (int i = 1; i < prices.size(); i++) {
+                if (maxProfit < prices.get(i) - prices.get(minIndex)) {
+                    maxProfit = prices.get(i) - prices.get(minIndex);
+                    buy = minIndex + 1;
+                    sell = i + 1;
                 }
+                if (prices.get(minIndex) > prices.get(i)) {
+                    minIndex = i;
+                }
+            }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException(e);
         }
-        return new Pair<>(buy + 1, sale + 1);
+        return new Pair<>(buy, sell);
     }
 
     /**
@@ -113,35 +117,45 @@ public class JavaAlgorithms {
      * Общий комментарий: решение из Википедии для этой задачи принимается,
      * но приветствуется попытка решить её самостоятельно.
      */
-    //Трудоёмкость O(n)
+    // Трудоёмкость O(n), n = menNumber
+    // Ресурсоёмкость O(n), n = menNumber
     static public int josephTask(int menNumber, int choiceInterval) {
         ArrayList<Integer> numbers = new ArrayList<>();
         int counter = 0;
         int counterX = 0;
 
+        if (menNumber <= 0 || choiceInterval <= 0)
+            throw new IllegalArgumentException();
+
         if (choiceInterval == 1 || menNumber == 1)
             return menNumber;
 
-        for (int i = 1; i <= menNumber; i++)
-            numbers.add(i);
+        for (int j = 1; j <= menNumber; j++) {
+            numbers.add(j);
+        }
 
-        for (int i = 0; i < menNumber; i++) {
-            if (numbers.get(i) != -1)
-                counter++;
-            if (counter == choiceInterval) {
-                numbers.set(i, -1);
-                counter = 0;
-                counterX++;
+        int i = 0;
+        while (true) {
+            for (; i < menNumber; i++) {
+                if (numbers.get(i) != -1) {
+                    counter++;
+                }
+
+                if (counter == choiceInterval) {
+                    numbers.set(i, -1);
+                    counter = 0;
+                    counterX++;
+                    break;
+                }
             }
             if (counterX == menNumber - 1)
                 break;
-            if (i == menNumber - 1)
-                i = -1;
+            i = i  % menNumber;
         }
 
-        for (int i = 0; i < menNumber; i++) {
-            if (numbers.get(i) != -1)
-                return numbers.get(i);
+        for (int j = 0; j < menNumber; j++) {
+            if (numbers.get(j) != -1)
+                return numbers.get(j);
         }
         return 0;
     }
@@ -157,7 +171,8 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    //Трудоёмкость O(n^2)
+    // Трудоёмкость O(n*m), n - длина first, m - длина second
+    // Ресурсоёмкость O(n*m)
     static public String longestCommonSubstring(String first, String second) {
         int[][] charsInWords = new int[first.length() + 1][second.length() + 1];
         int maxSubString = -1;
@@ -179,8 +194,10 @@ public class JavaAlgorithms {
                             end = s;
                             begin = s - maxSubString;
                         }
-                    } else
+                    }
+                    else {
                         charsInWords[f][s] = 0;
+                    }
             }
 
         if (maxSubString == -1)
@@ -199,7 +216,8 @@ public class JavaAlgorithms {
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
      */
-    //Трудоёмкость O(n*n^(1/2))
+    // Трудоёмкость O(n*n^(1/2))
+    // Ресурсоёмкость O(n)
     static public int calcPrimesNumber(int limit) {
         if (limit <= 1)
             return 0;
@@ -210,14 +228,15 @@ public class JavaAlgorithms {
             numbers[k] = 1;
         }
 
-        for (int k = 1; k * k <= limit; k++) {
-            if (numbers[k] == 1)
-                for (int i = (k + 1) * (k + 1); i <= limit; i += k + 1) {
+        for (int k = 1; k * k <= limit; k++) { // n^(1/2)
+            if (numbers[k] == 1) {
+                for (int i = (k + 1) * (k + 1); i <= limit; i += k + 1) { // ~n?
                     if (numbers[i - 1] == 0)
                         continue;
                     numbers[i - 1] = 0;
                     counter--;
                 }
+            }
         }
         return counter;
     }
