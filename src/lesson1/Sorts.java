@@ -2,6 +2,7 @@ package lesson1;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("WeakerAccess")
@@ -140,5 +141,39 @@ public class Sorts {
             count[elements[j]]--;
         }
         return out;
+    }
+
+    private static <T extends Comparable<T>>  int partition(List<T> elements, int min, int max) {
+        T x = elements.get(min + random.nextInt(max - min + 1));
+        int left = min, right = max;
+        while (left <= right) {
+            while (elements.get(left).compareTo(x) < 0) {
+                left++;
+            }
+            while (elements.get(right).compareTo(x) > 0) {
+                right--;
+            }
+            if (left <= right) {
+                T temp = elements.get(left);
+                elements.set(left, elements.get(right));
+                elements.set(right, temp);
+                left++;
+                right--;
+            }
+        }
+        return right;
+    }
+
+
+    public static <T extends Comparable<T>> void quickSort(List<T> elements, int min, int max) {
+        if (min < max) {
+            int border = partition(elements, min, max);
+            quickSort(elements, min, border);
+            quickSort(elements, border + 1, max);
+        }
+    }
+
+    public static <T extends Comparable<T>> void quickSort(List<T> elements) {
+        quickSort(elements, 0, elements.size() - 1);
     }
 }

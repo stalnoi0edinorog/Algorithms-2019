@@ -1,6 +1,7 @@
 package lesson1;
 
 import kotlin.NotImplementedError;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.time.LocalTime;
@@ -106,11 +107,11 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    // Трудоёмкость O(n^2), n - число строк в inputName
+    // Трудоёмкость O(n(log(N)), n - число строк в inputName
     // Ресурсоёмкость O(n)
     static public void sortAddresses(String inputName, String outputName) {
-        List<String> addressesList = new ArrayList<>();
-        Map<String, List<String>> addressBook = new HashMap<>();
+        List<Address> addressesList;
+        Map<Address, List<String>> addressBook = new HashMap<>();
 
         try (
                 BufferedReader reader = new BufferedReader(new FileReader(inputName));
@@ -122,44 +123,23 @@ public class JavaTasks {
                     throw new IllegalArgumentException();
 
                 String[] lineSplit = line.split(" - ");
-                String address = lineSplit[1];
+                Address address = new Address(lineSplit[1]);
                 String person = lineSplit[0];
 
-                if (!addressesList.contains(address)) {
-                    addressesList.add(address);
+                if (!addressBook.keySet().contains(address)) {
                     addressBook.put(address, new ArrayList<>());
                 }
 
                 addressBook.get(address).add(person);
             }
 
-            for (int i = addressesList.size() - 1; i > 0; i--) {
-                for (int j = 0; j < i; j++) {
-                    String[] streetHouse = addressesList.get(j).split(" ");
-                    String[] streetHouse1 = addressesList.get(j + 1).split(" ");
+            addressesList = new ArrayList<>(addressBook.keySet());
+            Sorts.quickSort(addressesList);
 
-                    if (streetHouse[0].compareTo(streetHouse1[0]) < 0)
-                        continue;
-
-                    if (streetHouse[0].compareTo(streetHouse1[0]) > 0) {
-                        String address = addressesList.get(j);
-                        addressesList.set(j, addressesList.get(j + 1));
-                        addressesList.set(j + 1, address);
-                        continue;
-                    }
-
-                    if (Integer.valueOf(streetHouse[1]) > Integer.valueOf(streetHouse1[1])) {
-                        String address = addressesList.get(j);
-                        addressesList.set(j, addressesList.get(j + 1));
-                        addressesList.set(j + 1, address);
-                    }
-                }
-            }
-
-            for (String address: addressesList) {
+            for (Address address: addressesList) {
                 List<String> persons = addressBook.get(address);
                 writer.write(address + " - ");
-                Collections.sort(persons);
+                Sorts.quickSort(persons);
 
                 for (int i = 0; i < persons.size(); i++) {
                     writer.write(persons.get(i));
@@ -171,6 +151,46 @@ public class JavaTasks {
             }
         } catch (IOException e) {
             throw  new IllegalArgumentException(e);
+        }
+    }
+
+     static class Address implements Comparable<Address> {
+        private String street;
+        private int house;
+
+        Address(String address) {
+            street = address.split(" ")[0];
+            house = Integer.parseInt(address.split(" ")[1]);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = street.hashCode();
+            return result + house;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object == this)
+                return true;
+            if (object == null || object.getClass() != this.getClass())
+                return false;
+            Address address = (Address) object;
+            return house == address.house && street.equals(address.street);
+        }
+
+        @Override
+        public String toString() {
+            return street + " " + house;
+        }
+
+        @Override
+        public int compareTo(@NotNull Address other) {
+            if (street.compareTo(other.street) > 0)
+                return 1;
+            else if (street.compareTo(other.street) == 0)
+                    return Integer.compare(house, other.house);
+            return -1;
         }
     }
 
