@@ -1,9 +1,6 @@
 package lesson1;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 public class Sorts {
@@ -31,10 +28,39 @@ public class Sorts {
             elements[j+1] = current;
         }
     }
+    public static void selectionSort(int[] elements) {
+        for (int i = elements.length - 1; i >= 0; i--) {
+            int max_i = i;
+            for (int j = 0; j < i; j++) {
+                if (elements[j] > elements[max_i]) {
+                    max_i = j;
+                }
+            }
+            int current = elements[i];
+            elements[i] = elements[max_i];
+            elements[max_i] = current;
+        }
+    }
+
+    public static void bubbleSort(int[] elements) {
+        for (int i = elements.length - 1; i >= 0; i --) {
+            for (int j = 0; j < i; j++) {
+                if (elements[j] > elements[i]) {
+                    int current = elements[i];
+                    elements[i] = elements[j];
+                    elements[j] = current;
+                    System.out.println(Arrays.toString(elements));
+                }
+            }
+
+        }
+
+    }
 
     private static void merge(int[] elements, int begin, int middle, int end) {
         int[] left = Arrays.copyOfRange(elements, begin, middle);
         int[] right = Arrays.copyOfRange(elements, middle, end);
+
         int li = 0, ri = 0;
         for (int i = begin; i < end; i++) {
             if (li < left.length && (ri == right.length || left[li] <= right[ri])) {

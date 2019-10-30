@@ -40,7 +40,7 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    // Трудоёмкость O(n^2), n - число строк в inputName
+    // Трудоёмкость O(n*log(n)), n - число строк в inputName
     // Ресурсоёмкость O(n)
     static public void sortTimes(String inputName, String outputName) {
         try(
@@ -58,23 +58,12 @@ public class JavaTasks {
                 dateList.add(date);
             }
 
-            boolean sorted;
-            do {
-                sorted = true;
-                for (int i = 0; i < dateList.size() - 1; i++) {
-                    if (dateList.get(i).compareTo(dateList.get(i + 1)) > 0) {
-                        LocalTime date = dateList.get(i);
-                        dateList.set(i, dateList.get(i + 1));
-                        dateList.set(i + 1, date);
-                        sorted = false;
-                    }
-                }
-            } while (!sorted);
+            Sorts.quickSort(dateList);
 
             for (LocalTime el: dateList) {
                 writer.write(el.format(formatter));
                 writer.write("\n");
-        }
+            }
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
@@ -107,7 +96,7 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    // Трудоёмкость O(n(log(N)), n - число строк в inputName
+    // Трудоёмкость O(n(log(n)), n - число строк в inputName
     // Ресурсоёмкость O(n)
     static public void sortAddresses(String inputName, String outputName) {
         List<Address> addressesList;
@@ -119,18 +108,20 @@ public class JavaTasks {
         ) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.matches("(\\D+\\s?)+-\\s(\\D+\\s?)\\s\\d+"))
+                if (!line.matches("([А-ЯЁA-Zа-яёa-z]*\\s)+-\\s([А-ЯЁA-Za-zа-яё-]*\\s)+\\d+"))
                     throw new IllegalArgumentException();
 
                 String[] lineSplit = line.split(" - ");
                 Address address = new Address(lineSplit[1]);
                 String person = lineSplit[0];
+                List<String> persons = addressBook.get(address);
 
-                if (!addressBook.keySet().contains(address)) {
+                if (persons == null) {
                     addressBook.put(address, new ArrayList<>());
+                    persons = new ArrayList<>();
                 }
-
-                addressBook.get(address).add(person);
+                persons.add(person);
+                addressBook.put(address, persons);
             }
 
             addressesList = new ArrayList<>(addressBook.keySet());
@@ -224,7 +215,10 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
-    // Трудоёмкость O(n^2), n - число строк в inputName
+    // Количество уникальных значений температур 7731, среднее количество повторов каждого значения ~13 тыс.
+    // Трудоёмкость в среднем случае - ~O(5001*13000)
+    // Если в файле только неотрицательная температура с макс.уникальных значений, повторов в среднем ~20 тыс.
+    // в худшем - только неотрицательная температура, весь диапазон - ~O(5001*20000)
     // Ресурсоёмкость O(n)
     static public void sortTemperatures(String inputName, String outputName) {
         try (
@@ -250,8 +244,7 @@ public class JavaTasks {
                 if (mapTemp.containsKey(number)) {
                     int previous = mapTemp.get(number);
                     mapTemp.put(number, ++previous);
-                }
-                else {
+                } else {
                     mapTemp.put(number, 1);
                 }
 
@@ -263,8 +256,7 @@ public class JavaTasks {
                 for (; j >= 0; j--) {
                     if (negativeTemp.get(j) > current)
                         negativeTemp.set(j + 1, negativeTemp.get(j));
-                    else
-                        break;
+                    else break;
                 }
                 negativeTemp.set(j + 1, current);
             }
@@ -276,8 +268,7 @@ public class JavaTasks {
                     if (temp.get(j) > current) {
                         temp.set(j + 1, temp.get(j));
                     }
-                    else
-                        break;
+                    else break;
                 }
                 temp.set(j + 1, current);
             }
