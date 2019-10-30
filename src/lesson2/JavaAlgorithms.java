@@ -117,7 +117,7 @@ public class JavaAlgorithms {
      * Общий комментарий: решение из Википедии для этой задачи принимается,
      * но приветствуется попытка решить её самостоятельно.
      */
-    // Трудоёмкость  O(menNumber*choiceInterval)
+    // Трудоёмкость O(menNumber*choiceInterval)
     // Ресурсоёмкость O(n), n = menNumber
     static public int josephTask(int menNumber, int choiceInterval) {
         ArrayList<Integer> numbers = new ArrayList<>();
