@@ -1,13 +1,19 @@
 package lesson3;
 
-import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 // Attention: comparable supported but comparator is not
-public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implements CheckableSortedSet<T> {
+public class
+BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implements CheckableSortedSet<T> {
+
+    private Node<T> root = null;
+
+    private int size = 0;
+
+    private boolean isLeftChild;
 
     private static class Node<T> {
         final T value;
@@ -20,10 +26,6 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             this.value = value;
         }
     }
-
-    private Node<T> root = null;
-
-    private int size = 0;
 
     @Override
     public boolean add(T t) {
@@ -71,11 +73,91 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     /**
      * Удаление элемента в дереве
      * Средняя
+     * Трудоёмкость O(log(n)), n - количество узлов
+     * Ресурсоёмкость O(1)
      */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        @SuppressWarnings("unchecked")
+        T value = (T) o;
+        Node<T> parent = root;
+        Node<T> current = root;
+        isLeftChild = true;
+
+        if (root == null)
+            return false;
+
+        while (current.value.compareTo(value) != 0) {
+            parent = current;
+            if (current.value.compareTo(value) > 0) {
+                isLeftChild = true;
+                current = current.left;
+            } else {
+                isLeftChild = false;
+                current = current.right;
+            }
+            if (current == null)
+                return false;
+        }
+        remove(current, parent);
+        size--;
+        return true;
+    }
+
+    private void removeNode(Node<T> node) {
+        remove(node.value);
+    }
+
+    private void remove(Node<T> current, Node<T> parent) {
+        if (current.left == null && current.right == null) {
+            if (current == root) {
+                root = null;
+            } else if (isLeftChild) {
+                parent.left = null;
+            } else
+                parent.right = null;
+        } else if (current.left == null) {
+            if (current == root) {
+            root = current.right;
+            } else if (isLeftChild) {
+                parent.left = current.right;
+            } else
+                parent.right = current.right;
+        } else if (current.right == null) {
+            if (current == root) {
+                root = current.left;
+            } else if (isLeftChild) {
+                parent.left = current.left;
+            } else
+                parent.right = current.left;
+        } else {
+            Node<T> successor = getSuccessor(current);
+            if (current == root) {
+                root = successor;
+            } else if (isLeftChild) {
+                parent.left = successor;
+            } else
+                parent.right = successor;
+            successor.left = current.left;
+        }
+
+    }
+
+    private Node<T> getSuccessor(Node<T> node) {
+        Node<T> successorParent = node;
+        Node<T> successor = node;
+        Node<T> current = node.right;
+
+        while (current != null) {
+            successorParent = successor;
+            successor = current;
+            current = current.left;
+        }
+        if (successor != node.right) {
+            successorParent.left = successor.right;
+            successor.right = node.right;
+        }
+        return successor;
     }
 
     @Override
@@ -108,38 +190,58 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
 
     public class BinaryTreeIterator implements Iterator<T> {
 
+        private Node<T> next;
+        private Stack<Node<T>> stack = new Stack<>();
+
         private BinaryTreeIterator() {
-            // Добавьте сюда инициализацию, если она необходима
+            next = root;
+            while (next != null) {
+                stack.push(next);
+                next = next.left;
+            }
         }
 
         /**
          * Проверка наличия следующего элемента
          * Средняя
+         * Трудоёмкость O(1)
+         * Ресурсоёмкость O(1)
          */
         @Override
         public boolean hasNext() {
-            // TODO
-            throw new NotImplementedError();
+            return !stack.isEmpty();
         }
 
         /**
          * Поиск следующего элемента
          * Средняя
+         * Трудоёмкость O(1), в худшем случае O(n), n - количество узлов
+         * Ресурсоёмкость O(h), h - высота дерева
          */
         @Override
         public T next() {
-            // TODO
-            throw new NotImplementedError();
+            Node<T> lastInStack = stack.pop();
+            next = lastInStack;
+            if (lastInStack.right != null) {
+                lastInStack = lastInStack.right;
+                while (lastInStack != null) {
+                    if (!stack.contains(lastInStack))
+                        stack.push(lastInStack);
+                    lastInStack = lastInStack.left;
+                }
+            }
+            return next.value;
         }
 
         /**
          * Удаление следующего элемента
          * Сложная
+         * Трудоёмкость O(log(N))
+         * Ресурсоёмкость O(1)
          */
         @Override
         public void remove() {
-            // TODO
-            throw new NotImplementedError();
+           removeNode(next);
         }
     }
 
@@ -164,34 +266,37 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     /**
      * Для этой задачи нет тестов (есть только заготовка subSetTest), но её тоже можно решить и их написать
      * Очень сложная
+     * Трудоёмкость O(1)
+     * Ресурсоёмкость O(1)
      */
     @NotNull
     @Override
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        return new SubSet<>(this, fromElement, toElement);
     }
 
     /**
      * Найти множество всех элементов меньше заданного
      * Сложная
+     * Трудоёмкость O(1)
+     * Ресурсоёмкость O(1)
      */
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        return new SubSet<>(this, null, toElement);
     }
 
     /**
      * Найти множество всех элементов больше или равных заданного
      * Сложная
+     * Трудоёмкость O(1)
+     * Ресурсоёмкость O(1)
      */
     @NotNull
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        // TODO
-        throw new NotImplementedError();
+        return new SubSet<>(this, fromElement, null);
     }
 
     @Override
