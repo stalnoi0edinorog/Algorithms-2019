@@ -187,9 +187,6 @@ public class JavaGraphTasks {
             if (!independentVertexSet.contains(first))
                 independentVertexSet.add(first);
         }
-        System.out.println(independentVertexSet);
-        System.out.println();
-        System.out.println();
 
         Set<Graph.Vertex> largestIndependentVertexSet = new HashSet<>();
         for (Set<Graph.Vertex> max : independentVertexSet) {
