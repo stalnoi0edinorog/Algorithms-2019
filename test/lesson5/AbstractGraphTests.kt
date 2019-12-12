@@ -1,6 +1,7 @@
 package lesson5
 
 import lesson5.impl.GraphBuilder
+import org.junit.jupiter.api.Assertions
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -242,6 +243,23 @@ abstract class AbstractGraphTests {
             setOf(cross["A"], cross["B"], cross["C"], cross["D"]),
             cross.largestIndependentVertexSet()
         )
+        val graphException = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            val j = addVertex("J")
+            val k = addVertex("K")
+            addConnection(a, b)
+            addConnection(b, c)
+            addConnection(c, d)
+            addConnection(a, e)
+            addConnection(d, k)
+            addConnection(e, j)
+            addConnection(j, k)
+        }.build()
+        Assertions.assertThrows(IllegalArgumentException::class.java) { graphException.largestIndependentVertexSet() }
     }
 
     fun longestSimplePath(longestSimplePath: Graph.() -> Path) {

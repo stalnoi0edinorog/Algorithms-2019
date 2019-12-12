@@ -5,10 +5,13 @@ import kotlin.test.assertEquals
 abstract class AbstractDynamicTests {
     fun longestCommonSubSequence(longestCommonSubSequence: (String, String) -> String) {
         assertEquals("", longestCommonSubSequence("мой мир", "я"))
-        assertEquals("1", longestCommonSubSequence("1", "1"))
+        assertEquals("рата сферу", longestCommonSubSequence("Стратосфера, Носферату", "Траты на сферу"))
+        assertEquals("__-___", longestCommonSubSequence("-__-_--___-", "1_1_1-___1"))
+        assertEquals("олиария", longestCommonSubSequence("Полиамория", "полиандрия"))
         assertEquals("13", longestCommonSubSequence("123", "13"))
         assertEquals("здс", longestCommonSubSequence("здравствуй мир", "мы здесь"))
         assertEquals("emt ole", longestCommonSubSequence("nematode knowledge", "empty bottle"))
+        assertEquals("", longestCommonSubSequence("Экс-граф?_Плюш_изъят.", "Бьём чуждый цен хвощ!"))
         val expectedLength = "e kerwelkkd r".length
         assertEquals(
             expectedLength, longestCommonSubSequence(
@@ -47,12 +50,22 @@ abstract class AbstractDynamicTests {
             longestIncreasingSubSequence(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
         )
         assertEquals(listOf(2, 8, 9, 12), longestIncreasingSubSequence(listOf(2, 8, 5, 9, 12, 6)))
+        assertEquals(listOf(2, 8, 8, 9, 12), longestIncreasingSubSequence(listOf(2, 8, 5, 8, 9, 12, 6)))
+        assertEquals(listOf(2, 5, 8, 8, 9, 12), longestIncreasingSubSequence(listOf(2, 5, 8, 8, 9, 12, 6)))
+        assertEquals(listOf(10), longestIncreasingSubSequence(listOf(10, 9, 8, 7, 6, 5, 4, 3, 2, 1)))
+        assertEquals(listOf(2, 8, 9, 12), longestIncreasingSubSequence(listOf(2, 8, 5, 9, 12)))
+        assertEquals(listOf(5, 10, 12, 24), longestIncreasingSubSequence(listOf(5, 10, 6, 12, 3, 24, 7, 8)))
         assertEquals(
             listOf(23, 34, 56, 87, 91, 98, 140, 349), longestIncreasingSubSequence(
                 listOf(
                     23, 76, 34, 93, 123, 21, 56, 87, 91, 12, 45, 98, 140, 12, 5, 38, 349, 65, 94,
                     45, 76, 15, 99, 100, 88, 84, 35, 88
                 )
+            )
+        )
+        assertEquals(
+            listOf(11, 22, 27, 33, 444, 555), longestIncreasingSubSequence(
+                listOf(11, 5, 22, 6, 27, 7, 33, 8, 444, 555)
             )
         )
     }
